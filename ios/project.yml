@@ -1,4 +1,4 @@
-name: InstagramStudio
+name: ProfileStudio
 options:
   bundleIdPrefix: com.madara
   deploymentTarget:
@@ -9,15 +9,15 @@ settings:
     IPHONEOS_DEPLOYMENT_TARGET: '17.0'
     CODE_SIGNING_ALLOWED: NO
 targets:
-  InstagramStudio:
+  ProfileStudio:
     type: application
     platform: iOS
     sources:
       - path: InstagramStudio
     settings:
       base:
-        PRODUCT_BUNDLE_IDENTIFIER: com.madara.instagramstudio.ios
-        PRODUCT_NAME: InstagramStudio
+        PRODUCT_BUNDLE_IDENTIFIER: com.madara.profilestudio.mobile20261123
+        PRODUCT_NAME: ProfileStudio
         TARGETED_DEVICE_FAMILY: '1'
         INFOPLIST_FILE: Info.plist
         GENERATE_INFOPLIST_FILE: NO
@@ -25,7 +25,7 @@ targets:
         CURRENT_PROJECT_VERSION: '1'
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
 schemes:
-  InstagramStudio:
+  ProfileStudio:
     build:
       targets:
-        InstagramStudio: all
+        ProfileStudio: all

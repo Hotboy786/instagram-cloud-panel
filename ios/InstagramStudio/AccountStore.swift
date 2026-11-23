@@ -9,7 +9,7 @@ import Combine
 
     init() {
         fileURL = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
-            .appendingPathComponent("InstagramStudio/accounts.json")
+            .appendingPathComponent("ProfileStudio/accounts.json")
         do { records = try AccountRecords.load(from: fileURL) }
         catch { available = false; self.error = "Account list could not be read. It has been kept untouched. \(error.localizedDescription)" }
     }

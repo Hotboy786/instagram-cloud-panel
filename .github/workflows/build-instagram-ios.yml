@@ -1,4 +1,4 @@
-name: Build Instagram Studio IPA
+name: Build Profile Studio IPA
 on:
   push:
     branches: [codex/ios-instagram-studio]
@@ -11,7 +11,7 @@ concurrency:
   cancel-in-progress: true
 jobs:
   build:
-    runs-on: macos-15
+    runs-on: macos-15-intel
     timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4
@@ -31,21 +31,21 @@ jobs:
       - name: Build iPhone application
         run: |
           set -o pipefail
-          xcodebuild -project ios/InstagramStudio.xcodeproj -scheme InstagramStudio -configuration Release -sdk iphoneos -destination 'generic/platform=iOS' -derivedDataPath build/DerivedData CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY='' build | tee build/xcodebuild.log
+          xcodebuild -project ios/ProfileStudio.xcodeproj -scheme ProfileStudio -configuration Release -sdk iphoneos -destination 'generic/platform=iOS' -derivedDataPath build/DerivedData CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY='' build | tee build/xcodebuild.log
       - name: Package unsigned IPA for local signing
         run: |
           mkdir -p build/package/Payload
-          cp -R build/DerivedData/Build/Products/Release-iphoneos/InstagramStudio.app build/package/Payload/
+          cp -R build/DerivedData/Build/Products/Release-iphoneos/ProfileStudio.app build/package/Payload/
           cd build/package
-          zip -qry ../InstagramStudio-unsigned.ipa Payload
+          zip -qry ../ProfileStudio-unsigned.ipa Payload
           cd ..
-          shasum -a 256 InstagramStudio-unsigned.ipa > SHA256.txt
+          shasum -a 256 ProfileStudio-unsigned.ipa > SHA256.txt
       - name: Upload IPA
         uses: actions/upload-artifact@v4
         with:
-          name: InstagramStudio-unsigned-IPA
+          name: ProfileStudio-unsigned-IPA
           path: |
-            build/InstagramStudio-unsigned.ipa
+            build/ProfileStudio-unsigned.ipa
             build/SHA256.txt
           retention-days: 14
       - name: Upload build log

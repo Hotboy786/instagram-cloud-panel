@@ -1,6 +1,6 @@
 import SwiftUI
 
-@main struct InstagramStudioApp: App {
+@main struct ProfileStudioApp: App {
     var body: some Scene { WindowGroup { WorkspaceView().preferredColorScheme(.dark) } }
 }
 
@@ -16,7 +16,7 @@ struct WorkspaceView: View {
             VStack(spacing: 0) {
                 HStack {
                     Image(systemName: "camera.aperture").foregroundStyle(.pink)
-                    Text(selected?.name ?? "Instagram Studio").font(.headline).lineLimit(1)
+                    Text(selected?.name ?? "Profile Studio").font(.headline).lineLimit(1)
                     Spacer()
                     Button { showAccounts = true } label: {
                         Label("Accounts (\(store.records.accounts.count))", systemImage: "person.crop.rectangle.stack")
@@ -70,7 +70,7 @@ struct WorkspaceView: View {
                     }
                 }
             }
-            .alert("Instagram Studio", isPresented: Binding(get: { browser.message != nil || store.error != nil }, set: { if !$0 { browser.message = nil; store.error = nil } })) {
+            .alert("Profile Studio", isPresented: Binding(get: { browser.message != nil || store.error != nil }, set: { if !$0 { browser.message = nil; store.error = nil } })) {
                 Button("OK") { browser.message = nil; store.error = nil }
             } message: { Text(browser.message ?? store.error ?? "") }
         }
