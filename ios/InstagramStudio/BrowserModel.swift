@@ -50,6 +50,14 @@ import WebKit
                  decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
         let scheme = navigationAction.request.url?.scheme?.lowercased() ?? ""
         if ["https", "about", "blob"].contains(scheme) {
+            // Loading a tapped top-level link ourselves keeps universal links
+            // in this web view instead of handing them to an installed app.
+            if navigationAction.navigationType == .linkActivated,
+               navigationAction.targetFrame?.isMainFrame != false {
+                decisionHandler(.cancel)
+                webView.load(navigationAction.request)
+                return
+            }
             decisionHandler(.allow)
         } else {
             if navigationAction.targetFrame?.isMainFrame != false {
