@@ -1,0 +1,43 @@
+INSTAGRAM STUDIO FOR IPHONE - iOS 17 OR LATER
+
+This is a separate native iPhone app. It does not use Render or your PC for
+browsing. Accounts, login pages, login popups, and post/Reel links stay
+inside the app. External Instagram app and Safari launches are blocked.
+Some login providers may refuse embedded browsers; this app cannot override
+their restrictions. Instagram may still require verification or re-login.
+
+BUILD
+The GitHub Actions workflow builds an UNSIGNED IPA on a hosted Mac. It
+requires no Apple password or signing certificate in GitHub. Standard
+public-repository hosted runners are subject to GitHub's availability and
+usage policies. No paid/larger runner is configured.
+
+INSTALL FROM WINDOWS
+1. Open the repository's Actions tab and the successful Build Instagram
+   Studio IPA run. Download InstagramStudio-unsigned-IPA from Artifacts.
+2. Extract the downloaded ZIP to get InstagramStudio-unsigned.ipa.
+3. Use the current official Sideloadly (https://sideloadly.io) on Windows,
+   with its required Apple software, to sign and install the IPA yourself.
+   Enter Apple credentials only in your signing tool, never GitHub or chat.
+4. Follow iPhone's normal developer-mode and developer-trust requirements.
+5. Open Instagram Studio. Tap Accounts, add a name, and sign in directly.
+6. Add a second account and test switching. Restart the app and confirm
+   each account keeps its own session before adding all your accounts.
+
+Free Apple signing normally expires after seven days, requiring renewal.
+Daily account browsing runs on the iPhone; free signing still needs periodic
+refresh. Use the same Apple account and bundle identifier for updates.
+Do not uninstall the app if you want to retain its data. Back up the device.
+
+PROFILES
+Every account has a stable UUID and a separate persistent WebKit data store.
+Only one main browser is retained at a time to limit memory usage. Metadata
+is stored locally, with no password collection, server sync or cookie export.
+Your Windows/Render sessions are not imported. Sign in once on the phone.
+Your brother can install the app but signs in separately on his own device.
+The app imposes no numerical profile cap; device storage and WebKit limits apply.
+
+NOT A GUARANTEE
+Compilation and metadata tests do not validate live Instagram login, video,
+or upload compatibility. Test those on the real iPhone. No automated likes,
+automatic account rotation, CAPTCHA bypass, or permanent-login guarantee.

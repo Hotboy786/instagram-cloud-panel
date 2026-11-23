@@ -1,0 +1,57 @@
+name: Build Instagram Studio IPA
+on:
+  push:
+    branches: [codex/ios-instagram-studio]
+    paths: ['ios/**', '.github/workflows/build-instagram-ios.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: instagram-ios-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  build:
+    runs-on: macos-15
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check Xcode
+        run: xcodebuild -version
+      - name: Test account persistence and URL handling
+        run: |
+          mkdir -p build
+          swiftc ios/InstagramStudio/AccountRecords.swift ios/Tests/main.swift -o build/account-tests
+          build/account-tests
+      - name: Generate project
+        run: |
+          python3 ios/make_icon.py
+          brew list xcodegen >/dev/null 2>&1 || brew install xcodegen
+          cd ios
+          xcodegen generate
+      - name: Build iPhone application
+        run: |
+          set -o pipefail
+          xcodebuild -project ios/InstagramStudio.xcodeproj -scheme InstagramStudio -configuration Release -sdk iphoneos -destination 'generic/platform=iOS' -derivedDataPath build/DerivedData CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY='' build | tee build/xcodebuild.log
+      - name: Package unsigned IPA for local signing
+        run: |
+          mkdir -p build/package/Payload
+          cp -R build/DerivedData/Build/Products/Release-iphoneos/InstagramStudio.app build/package/Payload/
+          cd build/package
+          zip -qry ../InstagramStudio-unsigned.ipa Payload
+          cd ..
+          shasum -a 256 InstagramStudio-unsigned.ipa > SHA256.txt
+      - name: Upload IPA
+        uses: actions/upload-artifact@v4
+        with:
+          name: InstagramStudio-unsigned-IPA
+          path: |
+            build/InstagramStudio-unsigned.ipa
+            build/SHA256.txt
+          retention-days: 14
+      - name: Upload build log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: iOS-build-log
+          path: build/xcodebuild.log
+          if-no-files-found: ignore
