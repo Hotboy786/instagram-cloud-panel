@@ -27,7 +27,25 @@ import WebKit
         }
         accountID = account.id
         webView = next
-        navigate("https://www.instagram.com/")
+        // A new profile must open the website login form, not Instagram's
+        // generic home page, which can display an "Open Instagram" upsell.
+        configuration.websiteDataStore.httpCookieStore.getAllCookies { [weak self, weak next] cookies in
+            let hasSession = cookies.contains { cookie in
+                (cookie.domain == "instagram.com" || cookie.domain.hasSuffix(".instagram.com")) &&
+                cookie.name == "sessionid" && !cookie.value.isEmpty &&
+                (cookie.expiresDate == nil || cookie.expiresDate! > Date())
+            }
+            Task { @MainActor in
+                guard self?.accountID == account.id else { return }
+                next?.load(URLRequest(url: InstagramLink.startURL(hasSession: hasSession)))
+            }
+        }
+    }
+
+    func login() {
+        guard let view = webView else { return }
+        closePopup()
+        view.load(URLRequest(url: InstagramLink.login))
     }
 
     func navigate(_ value: String) {
@@ -61,7 +79,12 @@ import WebKit
             decisionHandler(.allow)
         } else {
             if navigationAction.targetFrame?.isMainFrame != false {
-                message = "This link requires another app. Use Instagram's web controls here instead."
+                if scheme == "instagram", !(webView.url?.path.hasPrefix("/accounts/login") ?? false) {
+                    decisionHandler(.cancel)
+                    login()
+                    return
+                }
+                message = "External apps stay closed. Tap Log in at the top to use Instagram's website login. Instagram may still restrict embedded-browser access."
             }
             decisionHandler(.cancel)
         }

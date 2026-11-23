@@ -34,6 +34,11 @@ enum StudioError: LocalizedError {
 }
 
 enum InstagramLink {
+    static let home = URL(string: "https://www.instagram.com/")!
+    static let login = URL(string: "https://www.instagram.com/accounts/login/")!
+
+    static func startURL(hasSession: Bool) -> URL { hasSession ? home : login }
+
     static func post(_ value: String) throws -> URL {
         guard var parts = URLComponents(string: value.trimmingCharacters(in: .whitespacesAndNewlines)),
               parts.scheme?.lowercased() == "https",

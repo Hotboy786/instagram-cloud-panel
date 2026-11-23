@@ -16,6 +16,8 @@ require(Set(restored.accounts.map(\.id)).count == 100, "Each account must use it
 require(restored.selectedID == records.selectedID, "Selection must survive restart")
 let canonical = try InstagramLink.post("https://instagram.com/reels/ABC/?tracking=1")
 require(canonical.absoluteString == "https://www.instagram.com/reel/ABC/", "Normalize links")
+require(InstagramLink.startURL(hasSession: false).absoluteString == "https://www.instagram.com/accounts/login/", "New accounts must start at the web login form")
+require(InstagramLink.startURL(hasSession: true) == InstagramLink.home, "Saved sessions can open home")
 for invalid in ["http://instagram.com/p/ABC/", "https://evil.com/reel/ABC/", "https://instagram.com@evil.com/p/ABC/", "https://instagram.com:443/p/ABC/", "instagram://reel/ABC", "https://instagram.com/accounts/login/"] {
     do { _ = try InstagramLink.post(invalid); fatalError("Invalid link accepted") } catch { }
 }

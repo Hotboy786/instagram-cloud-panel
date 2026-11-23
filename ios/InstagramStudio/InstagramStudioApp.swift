@@ -18,6 +18,8 @@ struct WorkspaceView: View {
                     Image(systemName: "camera.aperture").foregroundStyle(.pink)
                     Text(selected?.name ?? "Profile Studio").font(.headline).lineLimit(1)
                     Spacer()
+                    Button("Log in") { browser.login() }
+                        .font(.caption).buttonStyle(.bordered).disabled(browser.webView == nil)
                     Button { showAccounts = true } label: {
                         Label("Accounts (\(store.records.accounts.count))", systemImage: "person.crop.rectangle.stack")
                     }.font(.caption)
