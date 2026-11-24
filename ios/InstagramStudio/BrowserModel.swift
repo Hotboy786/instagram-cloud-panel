@@ -5,6 +5,7 @@ import WebKit
     @Published private(set) var webView: WKWebView?
     @Published private(set) var accountID: UUID?
     @Published private(set) var loading = false
+    @Published private(set) var desktopSite = UserDefaults.standard.object(forKey: "desktopWebsite") as? Bool ?? true
     @Published var popup: WKWebView?
     @Published var message: String?
     private var observer: NSKeyValueObservation?
@@ -19,6 +20,7 @@ import WebKit
         configuration.websiteDataStore = WKWebsiteDataStore(forIdentifier: account.id)
         configuration.allowsInlineMediaPlayback = true
         configuration.mediaTypesRequiringUserActionForPlayback = []
+        configuration.defaultWebpagePreferences.preferredContentMode = desktopSite ? .desktop : .mobile
         let next = WKWebView(frame: .zero, configuration: configuration)
         next.navigationDelegate = self; next.uiDelegate = self
         next.allowsBackForwardNavigationGestures = true
@@ -48,6 +50,12 @@ import WebKit
         view.load(URLRequest(url: InstagramLink.login))
     }
 
+    func toggleWebsiteMode() {
+        desktopSite.toggle()
+        UserDefaults.standard.set(desktopSite, forKey: "desktopWebsite")
+        webView?.reloadFromOrigin()
+    }
+
     func navigate(_ value: String) {
         guard let view = webView, let url = URL(string: value), url.scheme == "https" else { return }
         view.load(URLRequest(url: url))
@@ -65,28 +73,31 @@ import WebKit
     }
 
     func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction,
-                 decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
+                 preferences: WKWebpagePreferences,
+                 decisionHandler: @escaping (WKNavigationActionPolicy, WKWebpagePreferences) -> Void) {
+        preferences.preferredContentMode = desktopSite ? .desktop : .mobile
+        let finish = { (policy: WKNavigationActionPolicy) in decisionHandler(policy, preferences) }
         let scheme = navigationAction.request.url?.scheme?.lowercased() ?? ""
         if ["https", "about", "blob"].contains(scheme) {
             // Loading a tapped top-level link ourselves keeps universal links
             // in this web view instead of handing them to an installed app.
             if navigationAction.navigationType == .linkActivated,
                navigationAction.targetFrame?.isMainFrame != false {
-                decisionHandler(.cancel)
+                finish(.cancel)
                 webView.load(navigationAction.request)
                 return
             }
-            decisionHandler(.allow)
+            finish(.allow)
         } else {
             if navigationAction.targetFrame?.isMainFrame != false {
                 if scheme == "instagram", !(webView.url?.path.hasPrefix("/accounts/login") ?? false) {
-                    decisionHandler(.cancel)
+                    finish(.cancel)
                     login()
                     return
                 }
                 message = "External apps stay closed. Tap Log in at the top to use Instagram's website login. Instagram may still restrict embedded-browser access."
             }
-            decisionHandler(.cancel)
+            finish(.cancel)
         }
     }
 
@@ -97,6 +108,7 @@ import WebKit
             message = "External app links stay closed. Continue using the web page inside this app."; return nil
         }
         configuration.websiteDataStore = webView.configuration.websiteDataStore
+        configuration.defaultWebpagePreferences.preferredContentMode = desktopSite ? .desktop : .mobile
         let next = WKWebView(frame: .zero, configuration: configuration)
         next.navigationDelegate = self; next.uiDelegate = self
         popup = next

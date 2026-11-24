@@ -24,6 +24,11 @@ struct WorkspaceView: View {
                         Label("Accounts (\(store.records.accounts.count))", systemImage: "person.crop.rectangle.stack")
                     }.font(.caption)
                 }.padding(.horizontal).padding(.vertical, 12)
+                HStack {
+                    Text("Profile Studio 1.0.2").foregroundStyle(.secondary)
+                    Spacer()
+                    Button(browser.desktopSite ? "Desktop website ✓" : "Mobile website") { browser.toggleWebsiteMode() }
+                }.font(.caption2).padding(.horizontal).padding(.bottom, 8)
                 HStack(spacing: 8) {
                     TextField("Paste post or Reel link", text: $postLink)
                         .keyboardType(.URL).textInputAutocapitalization(.never).autocorrectionDisabled()
